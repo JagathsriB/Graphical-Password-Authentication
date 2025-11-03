@@ -1,12 +1,13 @@
-/*
-! tailwindcss v3.2.4 | MIT License | https://tailwindcss.com
-*/
+/* Import Tailwind's base, components, and utilities */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* Apply your new theme's base styles to the entire page */
 @layer base {
   body {
-    @apply bg-dark-bg text-gray-200 font-sans;
+    /* Sets the default background to beige and text to dark blue */
+    @apply bg-background text-text-dark font-sans;
   }
 }
+

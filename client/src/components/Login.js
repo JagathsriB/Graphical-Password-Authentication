@@ -6,7 +6,16 @@ import { Page } from "../util/config";
 import PasswordIcon from "./Items/PasswordIcon";
 import { nanoid } from "nanoid";
 
+// "Coastal Calm" Form Styles
+const cardStyle = "w-full max-w-md mx-auto bg-card rounded-2xl shadow-xl p-8";
+const inputStyle = "w-full p-3 bg-background text-text-dark border-2 border-gray-200 rounded-lg focus:outline-none focus:border-accent-blue focus:ring-2 focus:ring-accent-blue/50 transition-all";
+const buttonStyle = "w-full font-bold bg-accent-blue text-white py-3 px-8 rounded-full transition duration-300 ease-in-out hover:scale-105 hover:bg-blue-800";
+const categoryButtonStyle = "font-bold bg-stone-200 text-text-dark py-2 px-5 rounded-full transition duration-300 ease-in-out hover:scale-105 hover:bg-stone-300";
+
 export default function Login(props) {
+    // --- ALL YOUR ORIGINAL LOGIC REMAINS THE SAME ---
+    // (Pasting all your functions from `useState` to `completeLogin`)
+
     const [step, setStep] = useState(0);
     const [loginInfo, setLoginInfo] = useState({
         username: "",
@@ -17,14 +26,13 @@ export default function Login(props) {
     });
     const [imageData, setImageData] = useState([]);
     const [iteration, setIteration] = useState(0);
-    const [hint, setHint] = useState(""); // State for managing hints
+    const [hint, setHint] = useState(""); 
 
     useEffect(() => {
-        // Generate hints dynamically based on application state
         if (step === 0 && !loginInfo.username && !loginInfo.password) {
             setHint("Start by entering your username and password.");
         } else if (step === 0 && loginInfo.username && !loginInfo.password) {
-            setHint("A strong password helps protect your account. Use a mix of letters, numbers, and symbols.");
+            setHint("A strong password helps protect your account.");
         } else if (step === 1 && loginInfo.categories.length === 0) {
             setHint("No categories available. Verify if the API returned correct data.");
         } else if (imageData.length > 0 && loginInfo.pattern.length < 5) {
@@ -32,7 +40,7 @@ export default function Login(props) {
         } else if (step === 1 && loginInfo.pattern.length === 5) {
             setHint("You are ready to complete the login process. Click the 'Login' button.");
         } else {
-            setHint(""); // Clear hint if no conditions are met
+            setHint(""); 
         }
     }, [loginInfo, step, imageData]);
 
@@ -48,7 +56,6 @@ export default function Login(props) {
             Toast("Please enter username and password!");
             return;
         }
-
         props.setLoading(true);
         axios.post(`${api.url}/api/user/login`, {
             username: loginInfo.username,
@@ -88,7 +95,6 @@ export default function Login(props) {
         setLoginInfo(prev => {
             const patternIndex = prev.pattern.indexOf(id);
             let newPattern = [...prev.pattern];
-
             if (patternIndex > -1) {
                 newPattern.splice(patternIndex, 1);
             } else {
@@ -98,7 +104,6 @@ export default function Login(props) {
                 }
                 newPattern.push(id);
             }
-
             return {
                 ...prev,
                 pattern: newPattern
@@ -108,17 +113,14 @@ export default function Login(props) {
 
     function fetchCategoryImages(category) {
         props.setLoading(true);
-        
         const selectedSet = loginInfo.sets.find(set => 
             set.category === category
         );
-    
         if (!selectedSet || !selectedSet.images) {
             props.setLoading(false);
             Toast("No images found for this category");
             return;
         }
-    
         const categorizedImages = [
             selectedSet.images.slice(0, 16).map(img => ({
                 id: img.id,
@@ -126,7 +128,6 @@ export default function Login(props) {
                 category: category
             }))
         ];
-    
         props.setLoading(false);
         setImageData(categorizedImages);
         setIteration(0);
@@ -137,7 +138,6 @@ export default function Login(props) {
             Toast(`Select at least 5 images! (Currently ${loginInfo.pattern.length})`);
             return;
         }
-
         props.setLoading(true);
         axios.post(`${api.url}/api/user/login`, {
             username: loginInfo.username,
@@ -159,74 +159,86 @@ export default function Login(props) {
             Toast(err.response?.data?.message || "Login failed");
         });
     }
+    // --- END OF YOUR LOGIC ---
 
+    // --- This is the NEW, RESTYLED JSX ---
     return (
-        <div className="container mx-auto px-4 sm:h-[38rem] mt-12">
-            <div className="mb-4 text-white bg-gray-800 p-2 rounded">{hint}</div> {/* Display hint */}
+        <div className="container mx-auto px-4 mt-12 mb-24">
+            
+            {/* Styled Hint Box */}
+            {hint && (
+                <div className="max-w-md mx-auto bg-blue-100 text-blue-900 p-3 rounded-lg mb-4 text-center">
+                    {hint}
+                </div>
+            )}
+
             {step === 0 ? (
-                <div className="max-w-md mx-auto">
-                    <h2 className="text-2xl text-white mb-4">Login</h2>
-                    <input 
-                        type="text" 
-                        name="username" 
-                        placeholder="Username" 
-                        value={loginInfo.username}
-                        onChange={handleChange}
-                        className="w-full p-2 mb-4 bg-gray-700 text-white"
-                    />
-                    <input 
-                        type="password" 
-                        name="password" 
-                        placeholder="Password" 
-                        value={loginInfo.password}
-                        onChange={handleChange}
-                        className="w-full p-2 mb-4 bg-gray-700 text-white"
-                    />
-                    <button 
-                        onClick={handleFirstStepSubmit}
-                        className="w-full bg-blue-600 text-white p-2"
-                    >
-                        Next
-                    </button>
+                <div className={cardStyle}>
+                    <h2 className="text-3xl font-bold text-text-dark mb-6 text-center">Login</h2>
+                    <div className="flex flex-col gap-4">
+                        <input
+                            type="text"
+                            name="username"
+                            placeholder="Username"
+                            value={loginInfo.username}
+                            onChange={handleChange}
+                            className={inputStyle}
+                        />
+                        <input
+                            type="password"
+                            name="password"
+                            placeholder="Password"
+                            value={loginInfo.password}
+                            onChange={handleChange}
+                            className={inputStyle}
+                        />
+                        <button
+                            onClick={handleFirstStepSubmit}
+                            className={`${buttonStyle} mt-4`}
+                        >
+                            Next
+                        </button>
+                    </div>
                 </div>
             ) : (
-                <div className="sm:flex h-full">
-                    <div className="w-full sm:w-3/4 bg-[#3B3B3B] rounded-lg p-4">
-                        <div className="mb-4">
-                            <h3 className="text-white text-lg mb-2">Choose Categories</h3>
-                            <div className="flex flex-wrap gap-2">
-                                {loginInfo.categories.map((category, index) => (
-                                    <button 
-                                        key={index}
-                                        onClick={() => fetchCategoryImages(category)}
-                                        className="bg-blue-600 text-white p-2 rounded"
-                                    >
-                                        {category}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-                        
-                        {imageData.length > 0 && (
-                            <div className="grid grid-cols-4 gap-2">
-                                {getIcons()}
-                            </div>
-                        )}
+                <div className="w-full max-w-3xl mx-auto bg-card rounded-2xl shadow-xl p-8">
+                    <h2 className="text-3xl font-bold text-text-dark mb-6">Select Your Pattern</h2>
 
-                        <div className="mt-4">
-                            <p className="text-white mb-2">
-                                Images Selected: {loginInfo.pattern.length}/5
-                            </p>
-                            <button 
-                                onClick={completeLogin}
-                                className="w-full bg-green-600 text-white p-2"
-                            >
-                                Login
-                            </button>
+                    <div className="mb-6">
+                        <h3 className="text-text-light text-lg mb-3">Choose Your Categories:</h3>
+                        <div className="flex flex-wrap gap-3">
+                            {loginInfo.categories.map((category, index) => (
+                                <button
+                                    key={index}
+                                    onClick={() => fetchCategoryImages(category)}
+                                    className={categoryButtonStyle}
+                                >
+                                    {category}
+                                </button>
+                            ))}
                         </div>
+                    </div>
+
+                    {imageData.length > 0 && (
+                        <div className="grid grid-cols-4 gap-2 border-2 border-gray-200 bg-background p-2 rounded-lg">
+                            {getIcons()}
+                        </div>
+                    )}
+
+                    <div className="mt-6">
+                        <p className="text-text-light mb-4">
+                            Images Selected: {loginInfo.pattern.length}/5
+                        </p>
+                        <button
+                            onClick={completeLogin}
+                            className={buttonStyle} // Changed from green to consistent blue
+                        >
+                            Login
+                        </button>
                     </div>
                 </div>
             )}
         </div>
     );
 }
+

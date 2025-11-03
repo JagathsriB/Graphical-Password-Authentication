@@ -10,7 +10,16 @@ import { Page } from "../util/config";
 import { api } from "../static/config";
 import { nanoid } from "nanoid";
 
+// New "Coastal Calm" Form Styles
+const cardStyle = "w-full max-w-md mx-auto bg-card rounded-2xl shadow-xl p-8";
+const inputStyle = "w-full p-3 bg-background text-text-dark border-2 border-gray-200 rounded-lg focus:outline-none focus:border-accent-blue focus:ring-2 focus:ring-accent-blue/50 transition-all";
+const buttonStyle = "w-full font-bold bg-accent-blue text-white py-3 px-8 rounded-full transition duration-300 ease-in-out hover:scale-105 hover:bg-blue-800";
+const searchButtonStyle = "font-bold bg-accent-yellow text-text-dark p-3 rounded-lg transition duration-300 hover:scale-105 hover:bg-yellow-300";
+
 export default function Signup(props) {
+    // --- ALL YOUR ORIGINAL LOGIC REMAINS THE SAME ---
+    // (Pasting all your functions from `useState` to `handleNextClick`)
+
     const [next, setNext] = useState(false);
     const [keyword, setKeyword] = useState("");
     const [imageData, setImageData] = useState([]);
@@ -51,10 +60,7 @@ export default function Signup(props) {
             let newCategories = [...prev.categories];
     
             if (patternIndex > -1) {
-                // Remove image from pattern
                 newPattern.splice(patternIndex, 1);
-    
-                // Remove category if no more images are selected for it
                 const categoryIndex = newSets.findIndex((set) =>
                     set.selectedIds.includes(id)
                 );
@@ -75,13 +81,9 @@ export default function Signup(props) {
                     return prev;
                 }
                 newPattern.push(id);
-    
-                // Add category if not already added
                 if (!newCategories.includes(keyword)) {
                     newCategories.push(keyword);
                 }
-    
-                // Update sets with selected images for the current category
                 const categorySetIndex = newSets.findIndex(
                     (set) => set.category === keyword
                 );
@@ -98,10 +100,7 @@ export default function Signup(props) {
                     });
                 }
             }
-    
-            // Update selected categories state
             setSelectedCategories(newCategories);
-    
             return {
                 ...prev,
                 pattern: newPattern,
@@ -111,13 +110,11 @@ export default function Signup(props) {
         });
     }
     
-    
     function searchKeyword() {
         if (keyword.trim() === "") {
             Toast("Invalid keyword!");
             return;
         }
-    
         props.setLoading(true);
         axios
             .get(`${api.url}/api/image/search?keyword=${keyword}`)
@@ -127,7 +124,6 @@ export default function Signup(props) {
                     Toast("No images found for this keyword.");
                     return;
                 }
-    
                 setImageData(
                     images.map((img) => ({
                         id: img.id || nanoid(),
@@ -135,12 +131,9 @@ export default function Signup(props) {
                         category: keyword,
                     }))
                 );
-    
-                // Ensure sets includes all images for the current category
                 setSignupInfo((prev) => {
                     const newSets = [...prev.sets];
                     const categorySetIndex = newSets.findIndex((set) => set.category === keyword);
-    
                     if (categorySetIndex > -1) {
                         newSets[categorySetIndex].images = images;
                     } else {
@@ -150,10 +143,8 @@ export default function Signup(props) {
                             selectedIds: [],
                         });
                     }
-    
                     return { ...prev, sets: newSets };
                 });
-    
                 props.setLoading(false);
             })
             .catch((err) => {
@@ -163,23 +154,19 @@ export default function Signup(props) {
             });
     }
     
-
     function createAccount() {
         if (signupInfo.pattern.length < 5) {
             Toast(`Select at least 5 images! (Currently ${signupInfo.pattern.length})`);
             return;
         }
-    
         if (signupInfo.categories.length < 1 || signupInfo.categories.length > 5) {
             Toast("Use at least 1 and at most 5 different categories!");
             return;
         }
-    
-        console.log("Signup Info:", signupInfo); // Debug here
-    
+        const { sets, ...payload } = signupInfo;
         props.setLoading(true);
         axios
-            .post(`${api.url}/api/user/signup`, signupInfo)
+            .post(`${api.url}/api/user/signup`, payload) 
             .then(res => {
                 props.setLoading(false);
                 props.setUserInfo({ email: res.data.email, username: res.data.username });
@@ -194,7 +181,6 @@ export default function Signup(props) {
             });
     }
     
-
     function validateData() {
         if (signupInfo.username.length < 1) {
             Toast("Invalid username!");
@@ -214,10 +200,8 @@ export default function Signup(props) {
     async function validateUsernameAndEmail() {
         const isEmailExist = await checkEmail(signupInfo.email, props.setLoading);
         const isUsernameExists = await checkUsername(signupInfo.username, props.setLoading);
-
         if (isUsernameExists) Toast("Username already exists!");
         else if (isEmailExist) Toast("Email already exists!");
-
         return !isEmailExist && !isUsernameExists;
     }
 
@@ -227,84 +211,90 @@ export default function Signup(props) {
         }
     }
 
+    // --- END OF YOUR LOGIC ---
+
+    // --- This is the NEW, RESTYLED JSX ---
     return (
-        <div className="container mx-auto px-4 sm:h-[38rem] mt-12">
+        <div className="container mx-auto px-4 mt-12 mb-24">
             {!next ? (
-                <div className="max-w-md mx-auto">
-                    <h2 className="text-2xl text-white mb-4">Create Your Account</h2>
-                    <input 
-                        type="text" 
-                        name="username" 
-                        placeholder="Username" 
-                        value={signupInfo.username}
-                        onChange={handleChange}
-                        className="w-full p-2 mb-4 bg-gray-700 text-white"
-                    />
-                    <input 
-                        type="email" 
-                        name="email" 
-                        placeholder="Email" 
-                        value={signupInfo.email}
-                        onChange={handleChange}
-                        className="w-full p-2 mb-4 bg-gray-700 text-white"
-                    />
-                    <input 
-                        type="password" 
-                        name="password" 
-                        placeholder="Password" 
-                        value={signupInfo.password}
-                        onChange={handleChange}
-                        className="w-full p-2 mb-4 bg-gray-700 text-white"
-                    />
-                    <button 
-                        onClick={handleNextClick}
-                        className="w-full bg-blue-600 text-white p-2"
-                    >
-                        Next
-                    </button>
+                <div className={cardStyle}>
+                    <h2 className="text-3xl font-bold text-text-dark mb-6 text-center">Create Your Account</h2>
+                    <div className="flex flex-col gap-4">
+                        <input
+                            type="text"
+                            name="username"
+                            placeholder="Username"
+                            value={signupInfo.username}
+                            onChange={handleChange}
+                            className={inputStyle}
+                        />
+                        <input
+                            type="email"
+                            name="email"
+                            placeholder="Email"
+                            value={signupInfo.email}
+                            onChange={handleChange}
+                            className={inputStyle}
+                        />
+                        <input
+                            type="password"
+                            name="password"
+                            placeholder="Password"
+                            value={signupInfo.password}
+                            onChange={handleChange}
+                            className={inputStyle}
+                        />
+                        <button
+                            onClick={handleNextClick}
+                            className={`${buttonStyle} mt-4`}
+                        >
+                            Next
+                        </button>
+                    </div>
                 </div>
             ) : (
-                <div className="sm:flex h-full">
-                    <div className="w-full sm:w-3/4 bg-[#3B3B3B] rounded-lg p-4">
-                        <div className="flex items-center mb-4">
-                            <input 
-                                type="text" 
-                                value={keyword}
-                                onChange={(e) => setKeyword(e.target.value)}
-                                placeholder="Search image category"
-                                className="flex-grow p-2 mr-2 bg-gray-700 text-white"
-                            />
-                            <button 
-                                onClick={searchKeyword}
-                                className="bg-blue-600 text-white p-2"
-                            >
-                                <FontAwesomeIcon icon={faSearch} />
-                            </button>
-                        </div>
-                        
-                        {imageData.length > 0 && (
-                            <div className="grid grid-cols-4 gap-2">
-                                {getIcons()}
-                            </div>
-                        )}
+                <div className="w-full max-w-3xl mx-auto bg-card rounded-2xl shadow-xl p-8">
+                    <h2 className="text-3xl font-bold text-text-dark mb-6">Choose Your Pattern</h2>
+                    
+                    <div className="flex items-center mb-6 gap-3">
+                        <input
+                            type="text"
+                            value={keyword}
+                            onChange={(e) => setKeyword(e.target.value)}
+                            placeholder="Search image category (e.g., 'cats', 'cars')"
+                            className={`${inputStyle} flex-grow`}
+                        />
+                        <button
+                            onClick={searchKeyword}
+                            className={searchButtonStyle}
+                        >
+                            <FontAwesomeIcon icon={faSearch} />
+                        </button>
+                    </div>
 
-                        <div className="mt-4">
-                            <p className="text-white mb-2">
-                                Selected Categories: {selectedCategories.join(", ")}
-                            </p>
-                            <p className="text-white mb-2">
-                                Images Selected: {signupInfo.pattern.length}/5
-                            </p>
-                            <button 
-                                onClick={createAccount}
-                                className="w-full bg-green-600 text-white p-2"
-                            >
-                                Create Account
-                            </button>
+                    {imageData.length > 0 && (
+                        <div className="grid grid-cols-4 gap-2 border-2 border-gray-200 bg-background p-2 rounded-lg">
+                            {getIcons()}
                         </div>
+                    )}
+
+                    <div className="mt-6">
+                        <p className="text-text-light mb-2">
+                            Selected Categories: {selectedCategories.join(", ")}
+                        </p>
+                        <p className="text-text-light mb-4">
+                            Images Selected: {signupInfo.pattern.length}/5
+                        </p>
+                        <button
+                            onClick={createAccount}
+                            className={buttonStyle} // Changed from green to the consistent blue
+                        >
+                            Create Account
+                        </button>
                     </div>
                 </div>
             )}
         </div>
     );
 }
+

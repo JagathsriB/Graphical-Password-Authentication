@@ -1,27 +1,26 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ["./src/**/*.{html,js}"],
+  content: ["./src/**/*.{js,jsx,ts,tsx}", "./public/index.html"],
   theme: {
-    extend: { // <-- All your customizations go in here!
+    extend: {
       colors: {
-        'primary': '#A259FF',   // Your playful purple
-        'dark-bg': '#2B2B2B',   // Your main background
-        'dark-card': '#3B3B3B', // For cards, inputs, etc.
+        'background': '#FDFDF5', // Soft, minimal beige
+        'card': '#FFFFFF',       // Clean white for cards
+        'text-dark': '#1E3A8A',  // Your "dark blue" for text
+        'text-light': '#4B5563', // A softer gray for paragraphs
+        'accent-yellow': '#FACC15', // Your "mild yellow"
+        'accent-blue': '#1E3A8A',   // Your "dark blue" for buttons
       },
       fontFamily: {
-        // This adds a rounded, playful font as the default
+        // A minimal and attractive rounded font
         'sans': ['Nunito', 'ui-sans-serif', 'system-ui'],
       },
       borderRadius: {
         'xl': '1.0rem',
         '2xl': '1.5rem',
       },
-      // This adds the "glow" effect for playful focus
       ringColor: {
-        'primary': '#A259FF',
-      },
-      boxShadow: {
-        'glow-primary': '0 0 15px 0 rgba(162, 89, 255, 0.5)',
+        'accent-blue': '#1E3A8A',
       }
     },
     screens: {
@@ -35,3 +34,4 @@ module.exports = {
   },
   plugins: [],
 }
+

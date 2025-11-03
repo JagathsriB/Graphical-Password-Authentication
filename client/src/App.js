@@ -7,7 +7,6 @@ import Signup from "./components/Signup";
 import Footer from "./components/Footer";
 import Login from "./components/Login";
 import Loader from "./components/Items/Loader";
-import Contact from "./components/Contact";
 import Slider from "./components/Slider";
 
 function App() {
